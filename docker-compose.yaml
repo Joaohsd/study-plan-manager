@@ -1,0 +1,22 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: study-plan
+
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
