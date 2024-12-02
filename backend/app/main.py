@@ -75,14 +75,26 @@ async def reset_plans():
     init_sql = os.getenv("INIT_SQL", "db/init.sql")
     conn = await get_database()
     try:
-        # Ler o conteúdo do arquivo SQL
         with open(init_sql, 'r') as file:
             sql_commands = file.read()
-        # Executar os comandos SQL
         await conn.execute(sql_commands)
         return {"message": "study-plan database resetted successfully!"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed while resetting study-plan database: {str(e)}")
+    finally:
+        await conn.close()
+
+@app.delete("/api/v1/plans/{id}")
+async def delete_plan_by_id(id: int):
+    conn = await get_database()
+    try:
+        query = "SELECT * FROM plan WHERE id = $1"
+        plan = await conn.fetchrow(query, id)
+        if plan is None:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+        delete_query = "DELETE FROM plan WHERE id = $1"
+        await conn.execute(delete_query, id)
+        return {"message": "Plan removed successfully!"}
     finally:
         await conn.close()
 
