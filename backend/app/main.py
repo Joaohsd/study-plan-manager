@@ -58,9 +58,21 @@ async def get_all_plans():
     finally:
         await conn.close()
 
+@app.get("/api/v1/plans/{id}", response_model=Plan)
+async def get_plan_by_id(id: int):
+    conn = await get_database()
+    try:
+        query = "SELECT * FROM plan WHERE id = $1"
+        plan = await conn.fetchrow(query, id)
+        if plan is None:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+        return dict(plan)
+    finally:
+        await conn.close()
+
 @app.delete("/api/v1/plans/")
 async def reset_plans():
-    init_sql = os.getenv("INIT_SQL", "db/init.sql")  # Caminho padrão para o script de inicialização
+    init_sql = os.getenv("INIT_SQL", "db/init.sql")
     conn = await get_database()
     try:
         # Ler o conteúdo do arquivo SQL
