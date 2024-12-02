@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
-from schemas import Plan, CreatePlan
+from schemas import Plan, CreatePlan, Task, CreateTask, UpdateTask
 from typing import List
 import time
 import os
@@ -44,7 +44,6 @@ async def add_plan(plan: CreatePlan):
         raise HTTPException(status_code=500, detail=f"Failed while adding plan: {str(e)}")
     finally:
         await conn.close()
-
 
 @app.get("/api/v1/plans/", response_model=List[Plan])
 async def get_all_plans():
@@ -98,3 +97,86 @@ async def delete_plan_by_id(id: int):
     finally:
         await conn.close()
 
+@app.post("/api/v1/plans/{plan_id}/tasks/", status_code=201)
+async def add_task(plan_id: int, task: CreateTask):
+    conn = await get_database()
+    try:
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan_exists = await conn.fetchrow(query_check_plan, plan_id)
+        if not plan_exists:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+
+        query = """
+        INSERT INTO task (plan_id, description, week, completed)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+        """
+        async with conn.transaction():
+            new_task = await conn.fetchrow(
+                query,
+                plan_id,
+                task.description,
+                task.week,
+                task.completed
+            )
+            return {"message": "Task successfully created!", "task": dict(new_task)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed while adding task: {str(e)}")
+    finally:
+        await conn.close()
+
+@app.get("/api/v1/plans/{plan_id}/tasks/", response_model=List[Task], status_code=200)
+async def get_tasks(plan_id: int):
+    conn = await get_database()
+    try:
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan_exists = await conn.fetchrow(query_check_plan, plan_id)
+        if not plan_exists:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+
+        query = "SELECT * FROM task WHERE plan_id = $1"
+        rows = await conn.fetch(query, plan_id)
+        tasks = [dict(row) for row in rows]
+        return tasks
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed while getting tasks: {str(e)}")
+    finally:
+        await conn.close()
+
+@app.patch("/api/v1/plans/{plan_id}/tasks/{task_id}", status_code=200)
+async def update_task(plan_id: int, task_id: int, updated_task: UpdateTask):
+    conn = await get_database()
+    try:
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan_exists = await conn.fetchrow(query_check_plan, plan_id)
+        if not plan_exists:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+
+        query_check_task = "SELECT * FROM task WHERE id = $1 AND plan_id = $2"
+        task_exists = await conn.fetchrow(query_check_task, task_id, plan_id)
+        if not task_exists:
+            raise HTTPException(status_code=404, detail="Task not found.")
+
+        query_update_task = """
+        UPDATE task
+        SET description = COALESCE($1, description), 
+            week = COALESCE($2, week), 
+            completed = COALESCE($3, completed)
+        WHERE id = $4 AND plan_id = $5
+        RETURNING *;
+        """
+        updated_task_data = await conn.fetchrow(
+            query_update_task,
+            updated_task.description,
+            updated_task.week,
+            updated_task.completed,
+            task_id,
+            plan_id
+        )
+
+        return {"message": "Task updated successfully!", "task": dict(updated_task_data)}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed while updating task: {str(e)}")
+    finally:
+        await conn.close()
