@@ -1,11 +1,10 @@
 import google.generativeai as genai
 from schemas import GeneratedTask
-from typing import List
 import json
+import os
 
-genai.configure(api_key="AIzaSyCrtybUxhJrawAQf-OJe6jvy9w6CWdNZa0")
-
-
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
 def generateTasks(content: str) -> list:
@@ -18,7 +17,5 @@ def generateTasks(content: str) -> list:
         )
         return json.loads(result.candidates[0].content.parts[0].text)
     except:
-        print('DEU ERR')
+        print('Error while getting Gemini response')
         return []
-    
-generateTasks('Gera um plano de estudos de python')
