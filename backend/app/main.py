@@ -7,6 +7,8 @@ import time
 import os
 import asyncpg
 
+DAYS_IN_WEEK = 7
+
 # Função para obter a conexão com o banco de dados PostgreSQL
 async def get_database():
     DATABASE_URL = os.environ.get("PGURL", "postgres://postgres:postgres@db:5432/study-plan") 
@@ -50,13 +52,12 @@ async def add_plan(plan: CreatePlan):
         
         current_date = datetime.now().date() 
 
-        # Calculate the difference in days
-        delta = (plan.deadline - current_date).days/7
+        number_of_weeks = ((plan.deadline - current_date).days)/DAYS_IN_WEEK
 
         prompt = f"""
             Generate a study plan for {plan.goal}.
             The weekly time for studying is {time}.
-            The number of weeks is {delta}.
+            The number of weeks is {number_of_weeks}.
          """
          
         tasks = generateTasks(prompt)
