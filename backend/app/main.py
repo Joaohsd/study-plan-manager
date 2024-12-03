@@ -1,5 +1,7 @@
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from schemas import Plan, CreatePlan, Task, CreateTask, UpdateTask
+from llm_integration import generateTasks
 from typing import List
 import time
 import os
@@ -26,20 +28,50 @@ async def log_requests(request: Request, call_next):
 async def add_plan(plan: CreatePlan):
     conn = await get_database()
     try:
-        query = """
+        query_plan = """
         INSERT INTO plan (goal, deadline, daily_hours, created_at, progress)
         VALUES ($1, $2, $3, NOW(), $4)
         RETURNING *;
         """
+
+        query_task = """
+        INSERT INTO task (plan_id, description, week, completed)
+        VALUES ($1, $2, $3, $4);
+        """
+
         async with conn.transaction():
             new_plan = await conn.fetchrow(
-                query,
+                query_plan,
                 plan.goal,
                 plan.deadline,
                 plan.daily_hours,
                 0.0  # Initial plan with 0
             )
-            return {"message": "Plan successfully created!", "plan": new_plan}
+        
+        current_date = datetime.now().date() 
+
+        # Calculate the difference in days
+        delta = (plan.deadline - current_date).days/7
+
+        prompt = f"""
+            Generate a study plan for {plan.goal}.
+            The weekly time for studying is {time}.
+            The number of weeks is {delta}.
+         """
+         
+        tasks = generateTasks(prompt)
+        
+        async with conn.transaction():
+            for task in tasks:
+                await conn.fetchrow(
+                    query_task,
+                    new_plan['id'],
+                    task['description'],
+                    task['week'],
+                    False
+                )
+
+        return {"message": "Plan successfully created!", "plan": new_plan}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed while adding plan: {str(e)}")
     finally:

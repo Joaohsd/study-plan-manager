@@ -69,3 +69,13 @@ class UpdateTask(BaseModel):
         if v <= 0:
             raise ValueError("week must be a positive integer")
         return v
+
+class GeneratedTask(BaseModel):
+    description: str
+    week: int
+
+    @field_validator("week")
+    def week_must_be_positive(cls, v):
+        if v <= 0:
+            raise ValueError("week must be a positive integer")
+        return v
