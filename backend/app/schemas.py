@@ -41,3 +41,41 @@ class UpdatePlan(BaseModel):
             raise ValueError("progress must be between 0 and 1")
         return v
 
+class Task(BaseModel):
+    id: Optional[int] = None
+    plan_id: int
+    description: str
+    week: int
+    completed: bool
+
+class CreateTask(BaseModel):
+    description: str
+    week: int
+    completed: bool
+
+    @field_validator("week")
+    def week_must_be_positive(cls, v):
+        if v <= 0:
+            raise ValueError("week must be a positive integer")
+        return v
+
+class UpdateTask(BaseModel):
+    description: Optional[str] = None
+    week: Optional[int] = None
+    completed: Optional[bool] = None
+
+    @field_validator("week")
+    def week_must_be_positive(cls, v):
+        if v <= 0:
+            raise ValueError("week must be a positive integer")
+        return v
+
+class GeneratedTask(BaseModel):
+    description: str
+    week: int
+
+    @field_validator("week")
+    def week_must_be_positive(cls, v):
+        if v <= 0:
+            raise ValueError("week must be a positive integer")
+        return v
