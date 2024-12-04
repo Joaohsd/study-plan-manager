@@ -20,3 +20,14 @@ services:
     depends_on:
       - db
 
+  frontend:
+    build: ./frontend
+    restart: always
+    container_name: frontend
+    environment:
+      - FLASK_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
