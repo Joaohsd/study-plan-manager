@@ -7,22 +7,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body style="background-color: #1e1e1e">
-    <header class="py-3 px-3" style="background-color: #0c0c0c; font-size: 1rem; border-radius: 0px 0px 10px 10px;">
-        <a class="text-white text-decoration-none" href="/plans">My Plans</a>
+    <header class="py-3 px-3" style="background-color: #0c0c0c; font-size: 1rem; border-radius: 0px 0px 10px 10px; display: flex; gap: 30px;">
+        <a class="text-white text-decoration-none" href="/plans">Plans</a>
         <a class="text-white text-decoration-none" href="/reset-database">Reset</a>
     </header>
     <main>
         <div class="container mt-4 text-center text-white">
-            <h1>Tarefas do Plano: {{ plan.goal }}</h1>
+            <h1>Plan: {{ plan.goal }}</h1>
             <div class="mt-4">
                 {%if tasks%}
                 <table class="table table-dark table-striped">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Descrição</th>
+                            <th scope="col">Description</th>
                             <th scope="col">Status</th>
-                            <th scope="col">Ações</th>
+                            <th scope="col">Complete</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -33,9 +33,9 @@
                             <td>{{ task.description }}</td>
                             <td>
                                 {% if task.completed %}
-                                <span class="badge bg-success">Concluído</span>
+                                <span class="badge bg-success">Completed</span>
                                 {% else %}
-                                <span class="badge bg-warning">Pendente</span>
+                                <span class="badge bg-warning">Pending</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -47,7 +47,7 @@
                             </td>
                             <td>
                                 <form action="/delete-task/{{ plan.id }}/{{ task.id }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                                 </form>
                             </td>
                         </tr>

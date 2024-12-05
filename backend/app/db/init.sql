@@ -1,16 +1,18 @@
+DROP TABLE IF EXISTS "task";
+DROP TABLE IF EXISTS "plan";
+
 DO $$
 BEGIN
-   IF NOT EXISTS (
+   IF EXISTS (
       SELECT FROM pg_database
       WHERE datname = 'study-plan'
    ) THEN
-      CREATE DATABASE "study-plan";
+      DROP DATABASE "study-plan";
    END IF;
 END
 $$;
 
-DROP TABLE IF EXISTS "plan";
-DROP TABLE IF EXISTS "task";
+CREATE DATABASE "study-plan";
 
 CREATE TABLE plan (
     id SERIAL PRIMARY KEY,                 

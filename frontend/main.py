@@ -44,6 +44,16 @@ def get_plans():
         return render_template('plans.html', plans=response.json())
     
 @app.route('/get-tasks/<int:id>', methods=['POST'])
+def view_tasks(id):
+    response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
+    if response_task.status_code == 200:
+        response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
+        if response_plan.status_code == 200:
+            return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
+    else:
+        return "Error getting tasks", 500
+
+@app.route('/get-tasks/<int:id>', methods=['GET'])
 def get_tasks(id):
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
     if response_task.status_code == 200:
@@ -81,7 +91,7 @@ def delete_plan(id):
 def delete_task(plan_id, task_id):
     response = requests.delete(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks/{task_id}')
     if response.status_code == 200:
-        return redirect(get_tasks(plan_id))
+        return redirect(url_for('get_tasks', id=plan_id))
     else:
         return "Error deleting task", 500
 
