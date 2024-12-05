@@ -167,7 +167,7 @@ async def get_tasks(plan_id: int):
         if not plan_exists:
             raise HTTPException(status_code=404, detail="Plan not found.")
 
-        query = "SELECT * FROM task WHERE plan_id = $1"
+        query = "SELECT * FROM task WHERE plan_id = $1 ORDER BY task.id"
         rows = await conn.fetch(query, plan_id)
         tasks = [dict(row) for row in rows]
         return tasks
@@ -211,5 +211,34 @@ async def update_task(plan_id: int, task_id: int, updated_task: UpdateTask):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed while updating task: {str(e)}")
+    finally:
+        await conn.close()
+
+@app.delete("/api/v1/plans/{plan_id}/tasks/{task_id}", status_code=200)
+async def delete_task(plan_id: int, task_id: int):
+    conn = await get_database()
+    try:
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan_exists = await conn.fetchrow(query_check_plan, plan_id)
+        if not plan_exists:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+
+        query_check_task = "SELECT * FROM task WHERE id = $1 AND plan_id = $2"
+        task_exists = await conn.fetchrow(query_check_task, task_id, plan_id)
+        if not task_exists:
+            raise HTTPException(status_code=404, detail="Task not found.")
+
+        query_delete_task = "DELETE FROM task WHERE id = $1 AND plan_id = $2;"
+
+        await conn.fetchrow(
+            query_delete_task,
+            task_id,
+            plan_id
+        )
+
+        return {"message": "Task deleted successfully!"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed while deleting task: {str(e)}")
     finally:
         await conn.close()
