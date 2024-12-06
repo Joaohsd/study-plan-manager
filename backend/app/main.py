@@ -9,7 +9,7 @@ import asyncpg
 
 DAYS_IN_WEEK = 7
 
-# Função para obter a conexão com o banco de dados PostgreSQL
+# Get database connection
 async def get_database():
     DATABASE_URL = os.environ.get("PGURL", "postgres://postgres:postgres@db:5432/study-plan") 
     return await asyncpg.connect(DATABASE_URL)
@@ -27,7 +27,7 @@ async def startDB():
     finally:
         await conn.close()
 
-# Inicializar a aplicação FastAPI
+# Start FastAPI application
 app = FastAPI()
 
 @app.on_event("startup")
@@ -166,12 +166,12 @@ async def reset_plans():
 async def delete_plan_by_id(id: int):
     conn = await get_database()
     try:
-        query = "SELECT * FROM plan WHERE id = $1"
-        plan = await conn.fetchrow(query, id)
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan = await conn.fetchrow(query_check_plan, id)
         if plan is None:
             raise HTTPException(status_code=404, detail="Plan not found.")
-        delete_query = "DELETE FROM plan WHERE id = $1"
-        await conn.execute(delete_query, id)
+        query_delete_plan = "DELETE FROM plan WHERE id = $1"
+        await conn.execute(query_delete_plan, id)
         return {"message": "Plan removed successfully!"}
     finally:
         await conn.close()

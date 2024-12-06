@@ -33,16 +33,15 @@ def add_plan():
 
     # Send data to the API endpoint
     response = requests.post(f'{API_BASE_URL}/api/v1/plans/', json=payload)
-    # Check if the API request was successful
-    if response.status_code == 201:
-        response = requests.get(f'{API_BASE_URL}/api/v1/plans/')
-        if(response.status_code == 200):
-            return render_template('plans.html', plans=response.json())
-        else:
-            return "Plans not found", 400
-    else:
+    if response.status_code != 201:
         return "Error adding plan", 500
     
+    response = requests.get(f'{API_BASE_URL}/api/v1/plans/')
+    if response.status_code != 200:
+        return "Plans not found", 400
+
+    return render_template('plans.html', plans=response.json())
+
 @app.route('/plans', methods=['GET'])
 def get_plans():
     response = requests.get(f'{API_BASE_URL}/api/v1/plans/')
@@ -60,22 +59,27 @@ def delete_plan(id):
 @app.route('/get-tasks/<int:id>', methods=['POST'])
 def view_tasks(id):
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
-    if response_task.status_code == 200:
-        response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
-        if response_plan.status_code == 200:
-            return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
-    else:
+    if response_task.status_code != 200:
         return "Error getting tasks", 500
+    
+    response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
+    if response_plan.status_code != 200:
+        return "Error getting tasks", 500
+
+    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
 
 @app.route('/get-tasks/<int:id>', methods=['GET'])
 def get_tasks(id):
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
-    if response_task.status_code == 200:
-        response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
-        if response_plan.status_code == 200:
-            return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
-    else:
+    if response_task.status_code != 200:
         return "Error getting tasks", 500
+
+    response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
+    if response_plan.status_code != 200:
+        return "Error getting tasks", 500
+    
+    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
+        
     
 @app.route('/toggle-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def toggle_task(plan_id, task_id):
@@ -87,6 +91,7 @@ def toggle_task(plan_id, task_id):
     update_task = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks/{task_id}', json=payload)
     if update_task.status_code != 200:
         return 'Error', 500
+
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
     if response_task.status_code != 200:
         return 'Error', 500
@@ -102,7 +107,7 @@ def toggle_task(plan_id, task_id):
     }
 
     response_plan = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}', json=payload)
-    if response_task.status_code != 200:
+    if response_plan.status_code != 200:
         return 'Error', 500
 
     response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}')
@@ -140,7 +145,23 @@ def update_task(plan_id, task_id):
     if response_task.status_code != 200:
         return 'Error', 500
 
-    app.logger.debug("OLAAAAAA")
+    response_tasks = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
+    if response_task.status_code != 200:
+        return 'Error', 500
+
+    num_completed_tasks = 0
+    for task in response_tasks.json():
+        if task['completed'] == True:
+            num_completed_tasks = num_completed_tasks + 1
+
+    progress = num_completed_tasks / len(response_tasks.json())
+    payload = {
+        'progress': progress
+    }
+
+    response_plan = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}', json=payload)
+    if response_plan.status_code != 200:
+        return 'Error', 500
 
     return redirect(url_for('get_tasks', id=plan_id))
 
