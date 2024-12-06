@@ -14,8 +14,26 @@ async def get_database():
     DATABASE_URL = os.environ.get("PGURL", "postgres://postgres:postgres@db:5432/study-plan") 
     return await asyncpg.connect(DATABASE_URL)
 
+async def startDB():
+    init_sql = os.getenv("INIT_SQL", "db/init.sql")
+    conn = await get_database()
+    try:
+        with open(init_sql, 'r') as file:
+            sql_commands = file.read()
+        await conn.execute(sql_commands)
+        return {"message": "study-plan database resetted successfully!"}
+    except Exception as e:
+        return {"error": f"Failed to initialize the database: {str(e)}"}
+    finally:
+        await conn.close()
+
 # Inicializar a aplicação FastAPI
 app = FastAPI()
+
+@app.on_event("startup")
+async def on_startup():
+    result = await startDB()
+    print(result)
 
 # Middleware for logging
 @app.middleware("http")
@@ -104,17 +122,11 @@ async def get_plan_by_id(id: int):
 
 @app.delete("/api/v1/plans/")
 async def reset_plans():
-    init_sql = os.getenv("INIT_SQL", "db/init.sql")
-    conn = await get_database()
     try:
-        with open(init_sql, 'r') as file:
-            sql_commands = file.read()
-        await conn.execute(sql_commands)
-        return {"message": "study-plan database resetted successfully!"}
+        await startDB()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed while resetting study-plan database: {str(e)}")
-    finally:
-        await conn.close()
+
 
 @app.delete("/api/v1/plans/{id}")
 async def delete_plan_by_id(id: int):

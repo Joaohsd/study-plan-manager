@@ -43,6 +43,14 @@ def get_plans():
     if(response.status_code == 200):
         return render_template('plans.html', plans=response.json())
     
+@app.route('/delete-plan/<int:id>', methods=['POST'])
+def delete_plan(id):
+    response = requests.delete(f'{API_BASE_URL}/api/v1/plans/{id}')
+    if response.status_code == 200:
+        return redirect(url_for('get_plans'))
+    else:
+        return "Error adding plan", 500
+
 @app.route('/get-tasks/<int:id>', methods=['POST'])
 def view_tasks(id):
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
@@ -78,14 +86,6 @@ def update_task(plan_id, task_id):
     if response_plan.status_code != 200 and response_task != 200:
         return 'Error', 500
     return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
-    
-@app.route('/delete-plan/<int:id>', methods=['POST'])
-def delete_plan(id):
-    response = requests.delete(f'{API_BASE_URL}/api/v1/plans/{id}')
-    if response.status_code == 200:
-        return redirect(url_for('get_plans'))
-    else:
-        return "Error adding plan", 500
 
 @app.route('/delete-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def delete_task(plan_id, task_id):
