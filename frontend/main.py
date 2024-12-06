@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', error_message='')
 
 # Route to send the new plan to the API
 @app.route('/add-plan', methods=['POST'])
@@ -17,6 +17,12 @@ def add_plan():
     goal = request.form['goal']
     deadline = request.form['deadline']
     daily_hours = request.form['daily_hours']
+
+    if datetime.datetime.now().date() > datetime.datetime.strptime(deadline, '%Y-%m-%d').date():
+        return render_template('index.html', error_message="Invalid deadline")
+    
+    if float(daily_hours) <= 0:
+        return render_template('index.html', error_message="Invalid study time")
 
     # Create payload for the API request
     payload = {
@@ -72,7 +78,7 @@ def get_tasks(id):
         return "Error getting tasks", 500
     
 @app.route('/toggle-task/<int:plan_id>/<int:task_id>', methods=['POST'])
-def update_task(plan_id, task_id):
+def toggle_task(plan_id, task_id):
     data = request.get_json()
     completed = data.get('completed')
     payload = {
@@ -82,10 +88,61 @@ def update_task(plan_id, task_id):
     if update_task.status_code != 200:
         return 'Error', 500
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
+    if response_task.status_code != 200:
+        return 'Error', 500
+
+    num_completed_tasks = 0
+    for task in response_task.json():
+        if task['completed'] == True:
+            num_completed_tasks = num_completed_tasks + 1
+
+    progress = num_completed_tasks / len(response_task.json())
+    payload = {
+        'progress': progress
+    }
+
+    response_plan = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}', json=payload)
+    if response_task.status_code != 200:
+        return 'Error', 500
+
     response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}')
     if response_plan.status_code != 200 and response_task != 200:
         return 'Error', 500
     return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
+
+@app.route('/form-task/<int:plan_id>/<int:task_id>', methods=['POST'])
+def update_task_form(plan_id, task_id):
+    response_tasks = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
+    if response_tasks.status_code != 200:
+        return 'Error', 500
+
+    task = [task for task in response_tasks.json() if task['id'] == task_id]
+
+    if len(task) == 0:
+        return "Task not found", 404
+
+    task = task[0]
+
+    return render_template('update-task.html', task=task)
+
+@app.route('/update-task/<int:plan_id>/<int:task_id>', methods=['POST'])
+def update_task(plan_id, task_id):
+    data = request.get_json()
+
+    description = data.get('description')
+    completed = data.get('completed')
+    payload = {
+        'description': description,
+        'completed': completed
+    }
+    
+    response_task = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks/{task_id}', json=payload)
+    if response_task.status_code != 200:
+        return 'Error', 500
+
+    app.logger.debug("OLAAAAAA")
+
+    return redirect(url_for('get_tasks', id=plan_id))
 
 @app.route('/delete-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def delete_task(plan_id, task_id):

@@ -40,6 +40,11 @@
                             <button class="btn" style="background-color: #0c0c0c; color: #00d5b0;" type="submit">Submit</button>
                         </div>
                     </form>
+                    {% if error_message %}
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>     

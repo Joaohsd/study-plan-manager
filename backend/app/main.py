@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
-from schemas import Plan, CreatePlan, Task, CreateTask, UpdateTask
+from schemas import Plan, CreatePlan, UpdatePlan, Task, CreateTask, UpdateTask
 from llm_integration import generateTasks
 from typing import List
 import time
@@ -74,7 +74,7 @@ async def add_plan(plan: CreatePlan):
 
         prompt = f"""
             Generate a study plan for {plan.goal}.
-            The weekly time for studying is {time}.
+            The daily time for studying is {time}.
             The number of weeks is {number_of_weeks}.
          """
          
@@ -117,6 +117,40 @@ async def get_plan_by_id(id: int):
         if plan is None:
             raise HTTPException(status_code=404, detail="Plan not found.")
         return dict(plan)
+    finally:
+        await conn.close()
+
+@app.patch("/api/v1/plans/{plan_id}", status_code=200)
+async def update_plan(plan_id: int, updated_plan: UpdatePlan):
+    conn = await get_database()
+    try:
+        query_check_plan = "SELECT * FROM plan WHERE id = $1"
+        plan_exists = await conn.fetchrow(query_check_plan, plan_id)
+        if not plan_exists:
+            raise HTTPException(status_code=404, detail="Plan not found.")
+
+        query_update_plan = """
+        UPDATE plan
+        SET goal = COALESCE($1, goal), 
+            deadline = COALESCE($2, deadline), 
+            daily_hours = COALESCE($3, daily_hours), 
+            progress = COALESCE($4, progress)
+        WHERE id = $5
+        RETURNING *;
+        """
+        updated_plan_data = await conn.fetchrow(
+            query_update_plan,
+            updated_plan.goal,
+            updated_plan.deadline,
+            updated_plan.daily_hours,
+            updated_plan.progress,
+            plan_id,
+        )
+
+        return {"message": "Plan updated successfully!", "task": dict(updated_plan_data)}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed while updating plan: {str(e)}")
     finally:
         await conn.close()
 
