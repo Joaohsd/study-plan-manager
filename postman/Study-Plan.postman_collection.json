@@ -1,0 +1,576 @@
+{
+	"info": {
+		"_postman_id": "f6681ae7-fc48-4df6-a21c-d70ac4808c55",
+		"name": "Study-Plan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18909232",
+		"_collection_link": "https://c21600.postman.co/workspace/C216---Study-Plan~d0b11602-8170-444c-9d1d-88cf081e43ea/collection/40125318-f6681ae7-fc48-4df6-a21c-d70ac4808c55?action=share&source=collection_link&creator=18909232"
+	},
+	"item": [
+		{
+			"name": "Plan",
+			"item": [
+				{
+					"name": "Create",
+					"item": [
+						{
+							"name": "Add a new valid plan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    if(pm.response.to.have.status(201)){",
+											"        pm.environment.set('plan_id', (pm.response.json()).plan.id);",
+											"    }",
+											"});",
+											"pm.test(\"Should return 'Plan successfully created' message\", function () {",
+											"    pm.expect(pm.response.json().message).eql('Plan successfully created!')",
+											"});",
+											"pm.test(\"Should return plan\", function () {",
+											"    pm.expect(pm.response.json()).haveOwnProperty('plan')",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"goal\": \"Learn Python for Data Science\",\n    \"deadline\": \"2025-06-01\",\n    \"daily_hours\": 2\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Read",
+					"item": [
+						{
+							"name": "Get all plans",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Should return an array of plans\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"Each plan should have the correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    response.forEach((goal) => {",
+											"        pm.expect(goal).to.have.property('id').that.is.a('number');",
+											"        pm.expect(goal).to.have.property('goal').that.is.a('string').eql(\"Learn Python for Data Science\");",
+											"        pm.expect(goal).to.have.property('deadline').that.is.a('string').match(/^\\d{4}-\\d{2}-\\d{2}$/);",
+											"        pm.expect(goal).to.have.property('daily_hours').that.is.a('number');",
+											"        pm.expect(goal).to.have.property('created_at').that.is.a('string').match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{6}$/);",
+											"        pm.expect(goal).to.have.property('progress').that.is.a('number');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get one plan by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Should return a plan object with correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response).to.be.an('object');",
+											"    pm.expect(response).to.have.property('id').that.is.a('number');",
+											"    pm.expect(response).to.have.property('goal').that.is.a('string');",
+											"    pm.expect(response).to.have.property('deadline').that.is.a('string');",
+											"    pm.expect(response).to.have.property('daily_hours').that.is.a('number');",
+											"    pm.expect(response).to.have.property('created_at').that.is.a('string').match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{6}$/);",
+											"    pm.expect(response).to.have.property('progress').that.is.a('number');",
+											"});",
+											"",
+											"pm.test(\"Set environment variables from response\", function () {",
+											"    let response = pm.response.json();",
+											"    // Set environment variables for goal details",
+											"    pm.environment.set(\"plan_id\", response.id);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"item": [
+						{
+							"name": "Update Plan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Should return a success message\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response.message).to.eql(\"Plan updated successfully!\");",
+											"});",
+											"",
+											"pm.test(\"Should return a task object with correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    let task = response.task;",
+											"    ",
+											"    pm.expect(task).to.be.an('object');",
+											"    pm.expect(task).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('goal').that.is.a('string');",
+											"    pm.expect(task).to.have.property('deadline').that.is.a('string');",
+											"    pm.expect(task).to.have.property('daily_hours').that.is.a('number');",
+											"    pm.expect(task).to.have.property('created_at').that.is.a('string');",
+											"    pm.expect(task).to.have.property('progress').that.is.a('number');",
+											"});",
+											"",
+											"pm.test(\"Set environment variables from response\", function () {",
+											"    let response = pm.response.json();",
+											"    let task = response.task;",
+											"    ",
+											"    pm.environment.set(\"task_id\", task.id);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"goal\": \"Learn Javascript for Data Science\",\n    \"deadline\": \"2025-06-01\",\n    \"daily_hours\": 2,\n    \"progress\": 0.1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Task",
+			"item": [
+				{
+					"name": "Create",
+					"item": [
+						{
+							"name": "Add a new valid task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Should return a success message\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response.message).to.eql(\"Task successfully created!\");",
+											"});",
+											"",
+											"pm.test(\"Should return a task object with correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    let task = response.task;",
+											"    ",
+											"    pm.expect(task).to.be.an('object');",
+											"    pm.expect(task).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('plan_id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('description').that.is.a('string');",
+											"    pm.expect(task).to.have.property('week').that.is.a('number');",
+											"    pm.expect(task).to.have.property('completed').that.is.a('boolean');",
+											"});",
+											"",
+											"pm.test(\"Set environment variables from response\", function () {",
+											"    let response = pm.response.json();",
+											"    let task = response.task;",
+											"    ",
+											"    // Set environment variables for task details",
+											"    pm.environment.set(\"task_id\", task.id);",
+											"    pm.environment.set(\"plan_id\", task.plan_id);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\": \"Complete Chapter 1 of the course\",\n    \"week\": 1,\n    \"completed\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}/tasks/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}",
+										"tasks",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Read",
+					"item": [
+						{
+							"name": "Get all tasks from a plan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"    pm.environment.set('task_id', (pm.response.json())[0].id);",
+											"});",
+											"",
+											"pm.test(\"Should return an array of tasks\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"Each task should have the correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    response.forEach((task) => {",
+											"        pm.expect(task).to.have.property('id').that.is.a('number');",
+											"        pm.expect(task).to.have.property('plan_id').that.is.a('number');",
+											"        pm.expect(task).to.have.property('description').that.is.a('string');",
+											"        pm.expect(task).to.have.property('week').that.is.a('number');",
+											"        pm.expect(task).to.have.property('completed').that.is.a('boolean');",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}/tasks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}",
+										"tasks"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"item": [
+						{
+							"name": "Update Task",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Should return 'Plan successfully created' message\", function () {",
+											"    pm.expect(pm.response.json().message).eql('Task updated successfully!')",
+											"});",
+											"",
+											"pm.test(\"Should return task object with correct properties\", function () {",
+											"    let response = pm.response.json();",
+											"    let task = response.task;",
+											"    ",
+											"    pm.expect(task).to.be.an('object');",
+											"    pm.expect(task).to.have.property('id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('plan_id').that.is.a('number');",
+											"    pm.expect(task).to.have.property('description').that.is.a('string');",
+											"    pm.expect(task).to.have.property('week').that.is.a('number');",
+											"    pm.expect(task).to.have.property('completed').that.is.a('boolean');",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"completed\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}/tasks/{{task_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}",
+										"tasks",
+										"{{task_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Delete or Reset",
+			"item": [
+				{
+					"name": "TASK",
+					"item": [
+						{
+							"name": "Delete one task from a plan",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Should return a success message\", function () {",
+											"    let response = pm.response.json();",
+											"    pm.expect(response.message).to.eql(\"Task deleted successfully!\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}/tasks/{{task_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}",
+										"tasks",
+										"{{task_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "PLAN",
+					"item": [
+						{
+							"name": "Delete one plan by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"pm.test(\"Should return 'Plan removed successfully!\", function () {",
+											"    pm.expect(pm.response.json().message).eql('Plan removed successfully!')",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/{{plan_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										"{{plan_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "RESET DATABASE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/{{version}}/plans/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"{{version}}",
+										"plans",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
