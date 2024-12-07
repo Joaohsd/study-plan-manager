@@ -1,18 +1,7 @@
-DO $$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_database
-      WHERE datname = 'study-plan'
-   ) THEN
-      CREATE DATABASE "study-plan";
-   END IF;
-END
-$$;
-
-DROP TABLE IF EXISTS "plan";
 DROP TABLE IF EXISTS "task";
+DROP TABLE IF EXISTS "plan";
 
-CREATE TABLE plan (
+CREATE TABLE IF NOT EXISTS plan (
     id SERIAL PRIMARY KEY,                 
     goal TEXT NOT NULL,                  
     deadline DATE NOT NULL,              
@@ -21,7 +10,7 @@ CREATE TABLE plan (
     progress FLOAT DEFAULT 0.0           
 );
 
-CREATE TABLE task (
+CREATE TABLE IF NOT EXISTS task (
     id SERIAL PRIMARY KEY,                  
     plan_id INTEGER NOT NULL,                 
     description TEXT NOT NULL,             

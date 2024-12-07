@@ -19,4 +19,17 @@ services:
       - 8000:8000
     depends_on:
       - db
+    env_file:
+      - .env
+
+  frontend:
+    build: ./frontend
+    restart: always
+    container_name: frontend
+    environment:
+      - FLASK_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 

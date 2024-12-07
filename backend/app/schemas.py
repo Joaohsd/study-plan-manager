@@ -48,6 +48,7 @@ class Task(BaseModel):
     week: int
     completed: bool
 
+# Model for creating a new task
 class CreateTask(BaseModel):
     description: str
     week: int
@@ -59,6 +60,7 @@ class CreateTask(BaseModel):
             raise ValueError("week must be a positive integer")
         return v
 
+# Model for updating an existing task
 class UpdateTask(BaseModel):
     description: Optional[str] = None
     week: Optional[int] = None
@@ -70,6 +72,7 @@ class UpdateTask(BaseModel):
             raise ValueError("week must be a positive integer")
         return v
 
+# Model for LLM response
 class GeneratedTask(BaseModel):
     description: str
     week: int
