@@ -89,5 +89,5 @@ Uma aplicação para gerenciar planos de estudo, permitindo gerar planos atravé
 |:------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------:|
 | **Nome:** Paulo Henrique Lopes Júnior                                                                            | **Nome:** João Henrique Silva Delfino                                                                           |
 | **Matrícula:** 1748                                                                       | **Matrícula:** 1662                                                                       |
-| **E-mail:** [paulo.ph@gec.inatel](mailto:paulo.ph@gec.inatel)                                | **E-mail:** [joao.h@gec.inatel.br](mailto:joao.h@gec.inatel.br)                                |
+| **E-mail:** [paulo.ph@gec.inatel](mailto:paulo.ph@gec.inatel.br)                                | **E-mail:** [joao.h@gec.inatel.br](mailto:joao.h@gec.inatel.br)                                |
 | **LinkedIn:** [Paulo Lopes](https://www.linkedin.com/in/paulolopestech/)                                | **LinkedIn:** [João Delfino](https://www.linkedin.com/in/joao-delfino/)                                |
