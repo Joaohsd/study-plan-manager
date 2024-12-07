@@ -101,7 +101,7 @@ async def get_all_plans():
     conn = await get_database()
     try:
         # Recuperar todos os planos
-        query = "SELECT * FROM plan"
+        query = "SELECT * FROM plan ORDER BY plan.id"
         rows = await conn.fetch(query)
         plans = [dict(row) for row in rows]
         return plans

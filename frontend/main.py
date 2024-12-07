@@ -56,18 +56,6 @@ def delete_plan(id):
     else:
         return "Error adding plan", 500
 
-@app.route('/get-tasks/<int:id>', methods=['POST'])
-def view_tasks(id):
-    response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
-    if response_task.status_code != 200:
-        return "Error getting tasks", 500
-    
-    response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}')
-    if response_plan.status_code != 200:
-        return "Error getting tasks", 500
-
-    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
-
 @app.route('/get-tasks/<int:id>', methods=['GET'])
 def get_tasks(id):
     response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{id}/tasks')
@@ -78,9 +66,8 @@ def get_tasks(id):
     if response_plan.status_code != 200:
         return "Error getting tasks", 500
     
-    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
-        
-    
+    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())        
+
 @app.route('/toggle-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def toggle_task(plan_id, task_id):
     data = request.get_json()
@@ -92,16 +79,20 @@ def toggle_task(plan_id, task_id):
     if update_task.status_code != 200:
         return 'Error', 500
 
-    response_task = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
-    if response_task.status_code != 200:
+    response_tasks = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
+    if response_tasks.status_code != 200:
         return 'Error', 500
 
     num_completed_tasks = 0
-    for task in response_task.json():
+    for task in response_tasks.json():
         if task['completed'] == True:
             num_completed_tasks = num_completed_tasks + 1
 
-    progress = num_completed_tasks / len(response_task.json())
+    if len(response_tasks.json()) == 0:
+        progress = 0.0
+    else:
+        progress = num_completed_tasks / len(response_tasks.json())
+
     payload = {
         'progress': progress
     }
@@ -111,9 +102,10 @@ def toggle_task(plan_id, task_id):
         return 'Error', 500
 
     response_plan = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}')
-    if response_plan.status_code != 200 and response_task != 200:
+    if response_plan.status_code != 200:
         return 'Error', 500
-    return render_template('tasks.html', tasks=response_task.json(), plan=response_plan.json())
+
+    return render_template('tasks.html', tasks=response_tasks.json(), plan=response_plan.json())
 
 @app.route('/form-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def update_task_form(plan_id, task_id):
@@ -146,7 +138,7 @@ def update_task(plan_id, task_id):
         return 'Error', 500
 
     response_tasks = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
-    if response_task.status_code != 200:
+    if response_tasks.status_code != 200:
         return 'Error', 500
 
     num_completed_tasks = 0
@@ -154,7 +146,11 @@ def update_task(plan_id, task_id):
         if task['completed'] == True:
             num_completed_tasks = num_completed_tasks + 1
 
-    progress = num_completed_tasks / len(response_tasks.json())
+    if len(response_tasks.json()) == 0:
+        progress = 0.0
+    else:
+        progress = num_completed_tasks / len(response_tasks.json())
+
     payload = {
         'progress': progress
     }
@@ -168,10 +164,32 @@ def update_task(plan_id, task_id):
 @app.route('/delete-task/<int:plan_id>/<int:task_id>', methods=['POST'])
 def delete_task(plan_id, task_id):
     response = requests.delete(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks/{task_id}')
-    if response.status_code == 200:
-        return redirect(url_for('get_tasks', id=plan_id))
-    else:
+    if response.status_code != 200:
         return "Error deleting task", 500
+    
+    response_tasks = requests.get(f'{API_BASE_URL}/api/v1/plans/{plan_id}/tasks')
+    if response_tasks.status_code != 200:
+        return 'Error', 500
+
+    num_completed_tasks = 0
+    for task in response_tasks.json():
+        if task['completed'] == True:
+            num_completed_tasks = num_completed_tasks + 1
+
+    if len(response_tasks.json()) == 0:
+        progress = 0.0
+    else:
+        progress = num_completed_tasks / len(response_tasks.json())
+
+    payload = {
+        'progress': progress
+    }
+
+    response_plan = requests.patch(f'{API_BASE_URL}/api/v1/plans/{plan_id}', json=payload)
+    if response_plan.status_code != 200:
+        return 'Error', 500
+
+    return redirect(url_for('get_tasks', id=plan_id))
 
 # Route to reset the database
 @app.route('/reset-database', methods=['GET'])
