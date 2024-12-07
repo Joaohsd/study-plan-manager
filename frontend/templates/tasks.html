@@ -23,7 +23,7 @@
                             <th scope="col">Description</th>
                             <th scope="col">Status</th>
                             <th scope="col">Complete</th>
-                            <th></th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +46,7 @@
                                 />
                             </td>
                             <td>
-                                <span style="display: flex; flex-direction: row; gap: 20px;">
+                                <span style="display: flex; flex-direction: row; gap: 20px; justify-content: center;">
                                     <form action="/form-task/{{ plan.id }}/{{ task.id }}" method="POST">
                                         <button type="submit" class="btn btn-sm btn-primary">Edit</button>
                                     </form>
@@ -63,18 +63,6 @@
                 <p class="text-center">No tasks found for this plan</p>
                 {%endif%}
             </div>
-            <!--
-                <div class="mt-4">
-                    <h3>Adicionar Nova Tarefa</h3>
-                <form action="/add-task/{{ plan.id }}" method="POST">
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Descrição</label>
-                        <input required type="text" class="form-control" id="description" name="description" placeholder="Digite a descrição da tarefa">
-                    </div>
-                    <button class="btn btn-primary" type="submit">Adicionar</button>
-                </form>
-            </div>
-            -->
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> 
@@ -94,7 +82,6 @@
                 });
 
                 if (response.ok) {
-                    // Se o backend retornar HTML, recarregue a página
                     window.location.reload();
                 } else {
                     throw new Error('Erro ao atualizar a tarefa.');

@@ -46,13 +46,15 @@
                                     </div>
                                 </div>
                             </td>
-                            <td style="display: flex; justify-content: center; gap: 30px;">
-                                <form action="/get-tasks/{{ plan.id }}" method="GET" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-primary">View</button>
-                                </form>
-                                <form action="/delete-plan/{{ plan.id }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-                                </form>
+                            <td>
+                                <span style="display: flex; flex-direction: row; gap: 20px; justify-content: center;">
+                                    <form action="/get-tasks/{{ plan.id }}" method="GET" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-primary">View</button>
+                                    </form>
+                                    <form action="/delete-plan/{{ plan.id }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                    </form>
+                                </span>
                             </td>
                         </tr>
                         {%endfor%}
