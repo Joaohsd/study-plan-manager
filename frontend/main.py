@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import requests
-import os, datetime, time
+import datetime
 
 API_BASE_URL = "http://backend:8000"
 
