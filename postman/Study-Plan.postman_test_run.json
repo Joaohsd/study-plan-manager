@@ -1,22 +1,22 @@
 {
-	"id": "326d00a6-a48a-4cf6-abbf-d0e4539efe86",
+	"id": "19807f69-c747-42dc-8c2f-96c9bcc72b93",
 	"name": "Study-Plan",
-	"timestamp": "2024-12-07T02:34:23.387Z",
+	"timestamp": "2024-12-07T11:56:01.394Z",
 	"collection_id": "40125318-f6681ae7-fc48-4df6-a21c-d70ac4808c55",
 	"folder_id": 0,
 	"environment_id": "40125318-8b596a79-51f0-4a81-b2cb-987ad578f56f",
-	"totalPass": 28,
+	"totalPass": 31,
 	"delay": 0,
 	"persist": true,
 	"status": "finished",
-	"startedAt": "2024-12-07T02:34:04.058Z",
+	"startedAt": "2024-12-07T11:55:47.855Z",
 	"totalFail": 0,
 	"results": [
 		{
 			"id": "57c010b6-f5f5-4ed5-8926-25338c47b8c0",
 			"name": "Add a new valid plan",
 			"url": "http://localhost:8000/api/v1/plans/",
-			"time": 18546,
+			"time": 12545,
 			"responseCode": {
 				"code": 201,
 				"name": "Created"
@@ -41,7 +41,7 @@
 				}
 			},
 			"times": [
-				18546
+				12545
 			],
 			"allTests": [
 				{
@@ -52,10 +52,37 @@
 			]
 		},
 		{
+			"id": "b08232a0-8608-42a6-9752-2c28bc205c52",
+			"name": "Add invalid plan",
+			"url": "http://localhost:8000/api/v1/plans/",
+			"time": 3,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Entity"
+			},
+			"tests": {
+				"Verificar erro de validação para daily_hours": true
+			},
+			"testPassFailCounts": {
+				"Verificar erro de validação para daily_hours": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Verificar erro de validação para daily_hours": true
+				}
+			]
+		},
+		{
 			"id": "8dff5438-f145-4960-a36b-75e62a77dfe4",
 			"name": "Get all plans",
 			"url": "http://localhost:8000/api/v1/plans/",
-			"time": 35,
+			"time": 56,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -80,7 +107,7 @@
 				}
 			},
 			"times": [
-				35
+				56
 			],
 			"allTests": [
 				{
@@ -93,8 +120,8 @@
 		{
 			"id": "b22f4ea1-8419-43a7-bd8a-64494ca5aad3",
 			"name": "Get one plan by id",
-			"url": "http://localhost:8000/api/v1/plans/1",
-			"time": 34,
+			"url": "http://localhost:8000/api/v1/plans/7",
+			"time": 45,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -119,7 +146,7 @@
 				}
 			},
 			"times": [
-				34
+				45
 			],
 			"allTests": [
 				{
@@ -132,8 +159,8 @@
 		{
 			"id": "fa04e098-5c6d-4b0f-b895-5f79466c594f",
 			"name": "Update Plan",
-			"url": "http://localhost:8000/api/v1/plans/1",
-			"time": 35,
+			"url": "http://localhost:8000/api/v1/plans/7",
+			"time": 48,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -163,7 +190,7 @@
 				}
 			},
 			"times": [
-				35
+				48
 			],
 			"allTests": [
 				{
@@ -175,10 +202,37 @@
 			]
 		},
 		{
+			"id": "f0a14392-7ee8-4fbb-8918-943331ecaa88",
+			"name": "Update plan with invalid data",
+			"url": "http://localhost:8000/api/v1/plans/7",
+			"time": 3,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Entity"
+			},
+			"tests": {
+				"Verificar erro de validação para daily_hours": true
+			},
+			"testPassFailCounts": {
+				"Verificar erro de validação para daily_hours": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Verificar erro de validação para daily_hours": true
+				}
+			]
+		},
+		{
 			"id": "4b5ae108-9a3b-4c99-a573-0bc528d9beb1",
 			"name": "Add a new valid task",
-			"url": "http://localhost:8000/api/v1/plans/1/tasks/",
-			"time": 38,
+			"url": "http://localhost:8000/api/v1/plans/7/tasks/",
+			"time": 45,
 			"responseCode": {
 				"code": 201,
 				"name": "Created"
@@ -208,7 +262,7 @@
 				}
 			},
 			"times": [
-				38
+				45
 			],
 			"allTests": [
 				{
@@ -220,10 +274,37 @@
 			]
 		},
 		{
+			"id": "fcb12ce5-3ab3-4e91-ba31-ab3a978817eb",
+			"name": "Add a new invalid task",
+			"url": "http://localhost:8000/api/v1/plans/7/tasks/",
+			"time": 3,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Entity"
+			},
+			"tests": {
+				"Verificar erro de validação para week": true
+			},
+			"testPassFailCounts": {
+				"Verificar erro de validação para week": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Verificar erro de validação para week": true
+				}
+			]
+		},
+		{
 			"id": "a6fb9744-c398-4c0d-bf3e-3b80f37cf093",
 			"name": "Get all tasks from a plan",
-			"url": "http://localhost:8000/api/v1/plans/1/tasks",
-			"time": 38,
+			"url": "http://localhost:8000/api/v1/plans/7/tasks",
+			"time": 49,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -248,7 +329,7 @@
 				}
 			},
 			"times": [
-				38
+				49
 			],
 			"allTests": [
 				{
@@ -261,8 +342,8 @@
 		{
 			"id": "0075190b-6cbc-461b-9aee-e96afa2c5c5d",
 			"name": "Update Task",
-			"url": "http://localhost:8000/api/v1/plans/1/tasks/1",
-			"time": 36,
+			"url": "http://localhost:8000/api/v1/plans/7/tasks/70",
+			"time": 43,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -287,7 +368,7 @@
 				}
 			},
 			"times": [
-				36
+				43
 			],
 			"allTests": [
 				{
@@ -300,8 +381,8 @@
 		{
 			"id": "0d066a31-3f6e-4f85-bc91-788931d60356",
 			"name": "Delete one task from a plan",
-			"url": "http://localhost:8000/api/v1/plans/1/tasks/1",
-			"time": 45,
+			"url": "http://localhost:8000/api/v1/plans/7/tasks/70",
+			"time": 43,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -321,7 +402,7 @@
 				}
 			},
 			"times": [
-				45
+				43
 			],
 			"allTests": [
 				{
@@ -333,8 +414,8 @@
 		{
 			"id": "a31e8a65-6d2d-40fb-ada1-db4462e75899",
 			"name": "Delete one plan by id",
-			"url": "http://localhost:8000/api/v1/plans/1",
-			"time": 57,
+			"url": "http://localhost:8000/api/v1/plans/7",
+			"time": 43,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -354,7 +435,7 @@
 				}
 			},
 			"times": [
-				57
+				43
 			],
 			"allTests": [
 				{
@@ -367,7 +448,7 @@
 			"id": "75fa884b-3671-4b78-ad62-6cd217b74b5e",
 			"name": "RESET DATABASE",
 			"url": "http://localhost:8000/api/v1/plans/",
-			"time": 49,
+			"time": 42,
 			"responseCode": {
 				"code": 200,
 				"name": "OK"
@@ -382,7 +463,7 @@
 				}
 			},
 			"times": [
-				49
+				42
 			],
 			"allTests": [
 				{
@@ -392,11 +473,15 @@
 		}
 	],
 	"count": 1,
-	"totalTime": 18913,
+	"totalTime": 12968,
 	"collection": {
 		"requests": [
 			{
 				"id": "57c010b6-f5f5-4ed5-8926-25338c47b8c0",
+				"method": "POST"
+			},
+			{
+				"id": "b08232a0-8608-42a6-9752-2c28bc205c52",
 				"method": "POST"
 			},
 			{
@@ -412,7 +497,15 @@
 				"method": "PATCH"
 			},
 			{
+				"id": "f0a14392-7ee8-4fbb-8918-943331ecaa88",
+				"method": "PATCH"
+			},
+			{
 				"id": "4b5ae108-9a3b-4c99-a573-0bc528d9beb1",
+				"method": "POST"
+			},
+			{
+				"id": "fcb12ce5-3ab3-4e91-ba31-ab3a978817eb",
 				"method": "POST"
 			},
 			{
